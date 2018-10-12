@@ -1,0 +1,54 @@
+MultiSKAT_Kins_1 <-
+function (obj.res, Z, Sigma_p, kernel = "linear.weighted", Is.Common = FALSE, 
+    weights.beta = c(1, 25), weights = NULL, impute.method = "fixed", 
+    r.corr = 0, is_check_genotype = TRUE, is_dosage = FALSE, 
+    missing_cutoff = 0.15, estimate_MAF = 1, max_maf = 1, verbose = TRUE) 
+{
+    if (class(obj.res) != "MultiSKAT_NULL_related") {
+        stop("This function should be applied to related samples !!")
+    }
+    else {
+        Z1 <- Genotype.Kernels(Z, obj.res, kernel = kernel, Is.Common = Is.Common, 
+            weights.beta = weights.beta, weights = weights, impute.method = impute.method, 
+            r.corr = r.corr, is_check_genotype = is_check_genotype, 
+            is_dosage = is_dosage, missing_cutoff = missing_cutoff, 
+            estimate_MAF = estimate_MAF, max_maf = max_maf, verbose = verbose)
+        R = Sigma_p
+        R1 = mat.sqrt(Sigma_p)
+        U <- obj.res$U
+        D <- obj.res$D
+        V_g <- obj.res$V_g
+        Z <- Z1
+        Z1 <- t(U) %*% Z1
+        U1X <- as.matrix(obj.res$U1X)
+        d <- diag(D)
+        m = ncol(Z1)
+        n = nrow(Z1)
+        n.pheno = obj.res$n.pheno
+        q1 = obj.res$q1
+        N = obj.res$n.all
+        V.item = Get_GenInverse(obj.res$V.item.inv)
+        Q = MultiSKAT:::Test.Stat.Mod.Kins_adj(obj.res, Z, Sigma_p, Is.Common = FALSE)$Q
+        m1 = MultiSKAT:::Test.Stat.Mod.Kins_adj(obj.res, Z1, Sigma_p, Is.Common = FALSE)$m1
+        ZVinvZ = matrix(rep(0, m1 * m1), ncol = m1)
+        XVinvZ = matrix(rep(0, m1 * q1), ncol = m1)
+        resid = NULL
+        for (i in 1:n) {
+            id <- ((i - 1) * n.pheno + 1):(i * n.pheno)
+            if (!Is.Common) {
+                Z2 = t(Z1[i, ]) %x% R1
+            }
+            else {
+                Z2 = t(Z1[i, ]) %x% rep(1, n.pheno)
+            }
+            ZVinvZ <- ZVinvZ + t(Z2) %*% Get_GenInverse(V.item + d[i] * 
+                V_g) %*% Z2
+            XVinvZ <- XVinvZ + t(U1X[id, ]) %*% Get_GenInverse(V.item + 
+                d[i] * V_g) %*% Z2
+        }
+        W.1 = ZVinvZ - t(XVinvZ) %*% obj.res$XUVU1X1_inv %*% 
+            XVinvZ
+        out <- SKAT:::Get_Davies_PVal(Q/2, W.1, resid)
+        return(list(Q = Q, p.value = out$p.value, W = W.1, R = Sigma_p))
+    }
+}

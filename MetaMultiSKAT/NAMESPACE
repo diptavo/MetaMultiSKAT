@@ -1,0 +1,6 @@
+export(minP.Meta,Meta.MultiSKAT.base,Transform.MultiSKAT,Harmonize.Test.Info,Meta.MultiSKAT.wResample)
+
+import(SKAT,nlme,copula)
+
+
+importFrom("stats", "cor", "cov", "lm")

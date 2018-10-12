@@ -1,0 +1,13 @@
+Package: MetaMultiSKAT
+Type: Package
+Title: Region-based meta-analysis of multiple phenotypes
+Version: 1.0
+Date: 2018-10-09
+Author: Diptavo Dutta
+Maintainer: Diptavo Dutta <diptavo@umich.edu>
+Description: Rare-variant based meta analysis of multiple correlated continuous phenotypes using summary statistics from different studies
+Depends: SKAT, nlme, copula, MultiSKAT
+License: GPL (>=2)
+Suggests: knitr,rmarkdown,R.rsp
+VignetteBuilder: knitr
+
