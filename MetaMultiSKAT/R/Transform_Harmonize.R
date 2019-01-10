@@ -10,7 +10,7 @@ Transform.MultiSKAT <- function(S1,Sigma_g, Sigma_p){
   Q <- sum(Sc^2)
   m1 <- m*n.pheno
   S1$Test.Stat <- Q; 
-  S1$P.value <- SKAT:::Get_Davies_PVal(Q/2, S1$Regional.Info.Pheno.Adj, NULL)$p.value
+  S1$p.value <- SKAT:::Get_Davies_PVal(Q/2, S1$Regional.Info.Pheno.Adj, NULL)$p.value
   return(S1)
 }
 
