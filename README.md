@@ -1,6 +1,6 @@
 ### About
 
-MetaMultiSKAT provides a meta-analysis framework for performing rare-variant based tests of associations with multiple phenotypes across multiple studies. It is a kernel regression framework extension of [MultiSKAT](https://guides.github.com/diptavo/MultiSKAT). This is an initial working version. A number of functionalities will be added soon.
+MetaMultiSKAT provides a meta-analysis framework for performing rare-variant based tests of associations with multiple phenotypes across multiple studies. It is a kernel regression framework extension of [MultiSKAT](https://github.com/diptavo/MultiSKAT). This is an initial working version. A number of functionalities will be added soon.
 
 
 ### MetaMultiSKAT v(1.0)
