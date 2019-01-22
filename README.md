@@ -17,6 +17,10 @@ with the following packages pre-installed: *SKAT*, *copula*, *nlme*, *MultiSKAT*
 
 The manuscript will be uploaded soon to biorXiv.
 
+### Workflow
+
+An example workflow has been shown in the [wiki page](https://github.com/diptavo/MetaMultiSKAT/wiki)
+
 ### Main Functions
 
 **Meta.MultiSKAT.base**: Performs MetaMultiSKAT tests with a given Sigma_s, Sigma_P and Sigma_G structure
