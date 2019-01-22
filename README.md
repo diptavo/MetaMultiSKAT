@@ -7,6 +7,16 @@ MetaMultiSKAT provides a meta-analysis framework for performing rare-variant bas
 
 This package contains the R-codes/functions (including an example dataset) to carry out the MetaMultiSKAT tests. The package is still under developement. Any questions or bug-reports should be mailed to diptavo@umich.edu
 
+### Installation
+
+MetaMultiSKAT R-package can be installed from the downloaded gzipped tarball as
+```R CMD INSTALL MetaMultiSKAT_1.0.tar.gz ```
+with the following packages pre-installed: *SKAT*, *copula*, *nlme*, *MultiSKAT*
+
+### Citation
+
+The manuscript will be uploaded soon to biorXiv.
+
 ### Main Functions
 
 **Meta.MultiSKAT.base**: Performs MetaMultiSKAT tests with a given Sigma_s, Sigma_P and Sigma_G structure
