@@ -8,7 +8,7 @@ Extract.Scores <-  function(obj.data,Z1){
     return(re)
 }
 
-Extract.kins_Scores.kern <-  function(obj.data,Z1,kernel = "linear.weighted", Is.Common=FALSE, weights.beta=c(1,25), weights = NULL,
+Extract.kins_Scores.kern <-  function(obj.data,Z1,kernel = "linear.weighted", Is.Common=FALSE, weights.beta=c(1,1), weights = NULL,
                                       impute.method = "fixed",r.corr=0,   is_check_genotype=TRUE, is_dosage = FALSE, missing_cutoff=0.15, estimate_MAF=1,max_maf=1,verbose = FALSE){
   
   Z1 <- Genotype.Kernels(Z1,obj.data,kernel = kernel,Is.Common = Is.Common, weights.beta = weights.beta,weights = weights, impute.method = impute.method,r.corr=r.corr,is_check_genotype = is_check_genotype,
@@ -42,12 +42,12 @@ Extract.kins_Scores.kern <-  function(obj.data,Z1,kernel = "linear.weighted", Is
     }
     colnames(tr) <- colnames(Z1)
     resid = NULL;
-    re <- list(Score.Matrix = tr, n.pheno = n.pheno, y.cov = Get_GenInverse(obj.res$V.item.inv))  
+    re <- list(Score.Matrix = tr, n.pheno = n.pheno, y.cov = Get_GenInverse(obj.res$V.item.inv),weights.beta = weights.beta,N = obj.data$n.all)  
     class(re) <- "MetaMultiSKAT.Score.Object";
     return(re)
 }
 
-Extract.Scores.kern <- function(obj.data,Z1,kernel = "linear.weighted", Is.Common=FALSE, weights.beta=c(1,25), weights = NULL
+Extract.Scores.kern <- function(obj.data,Z1,kernel = "linear.weighted", Is.Common=FALSE, weights.beta=c(1,1), weights = NULL
                                 , impute.method = "fixed",r.corr=0,   is_check_genotype=TRUE, is_dosage = FALSE, missing_cutoff=0.15, estimate_MAF=1,max_maf=1,verbose = TRUE){
   
   Z1 <- Genotype.Kernels(Z1,obj.data,kernel = kernel,Is.Common = Is.Common, weights.beta = weights.beta,weights = weights, impute.method = impute.method,r.corr=r.corr,is_check_genotype = is_check_genotype,
@@ -76,32 +76,32 @@ Extract.Scores.kern <- function(obj.data,Z1,kernel = "linear.weighted", Is.Commo
     m1 <- m * n.pheno
   }
   resid = NULL
-  re <- list(Score.Matrix = Q.temp1, Score.Matrix.kern = tr, n.pheno = n.pheno, y.cov = Get_GenInverse(obj.data$V.item.inv),weights.beta = weights.beta)
+  re <- list(Score.Matrix = Q.temp1, Score.Matrix.kern = tr, n.pheno = n.pheno, y.cov = Get_GenInverse(obj.data$V.item.inv),weights.beta = weights.beta,N = obj.data$n.all)
   class(re) <- "MetaMultiSKAT.Score.Object";
   return(re)
 }
 
 
-Extract.Test.Info <- function(obj.data,Z1,kernel = "linear.weighted", Is.Common=FALSE, weights.beta=c(1,25), weights = NULL
-                              ,impute.method = "fixed",r.corr=0,   is_check_genotype=TRUE, is_dosage = FALSE, missing_cutoff=0.15, estimate_MAF=1,max_maf=1,verbose = FALSE){
+Extract.Test.Info <- function(obj.data,Z1,weights.beta=c(1,1)){
   
-  
+  kernel = "linear.weighted"; Is.Common=FALSE; weights = NULL;
+  impute.method = "fixed"; r.corr=0; is_check_genotype=TRUE; is_dosage = FALSE; missing_cutoff=0.15; estimate_MAF=1; max_maf=1; verbose = FALSE;
   
   if(class(obj.data) == "MultiSKAT_NULL_unrelated"){
     Sc = Extract.Scores.kern(obj.data,Z1,kernel = kernel,Is.Common = Is.Common, weights.beta = weights.beta,weights = weights, impute.method = impute.method,r.corr=r.corr,
                              is_check_genotype = is_check_genotype, is_dosage = is_dosage, missing_cutoff = missing_cutoff, estimate_MAF = estimate_MAF,max_maf = max_maf,verbose = verbose)
-    }else if(class(obj.data) == "MultiSKAT_NULL_related"){
+  }else if(class(obj.data) == "MultiSKAT_NULL_related"){
     Sc = Extract.kins_Scores.kern(obj.data,Z1,kernel = kernel,Is.Common = Is.Common, weights.beta = weights.beta,weights = weights, impute.method = impute.method,r.corr=r.corr,
-                            is_check_genotype = is_check_genotype, is_dosage = is_dosage, missing_cutoff = missing_cutoff, estimate_MAF = estimate_MAF,max_maf = max_maf,verbose = verbose)}
+                                  is_check_genotype = is_check_genotype, is_dosage = is_dosage, missing_cutoff = missing_cutoff, estimate_MAF = estimate_MAF,max_maf = max_maf,verbose = verbose)}
   
   n.pheno <- obj.data$n.pheno; Sigma_p <- diag(n.pheno);
-
+  
   maf <- MultiSKAT:::MAF(Z1); wts <- dbeta(maf,weights.beta[1],weights.beta[2])
- 
+  
   Sigma_g <-  diag(wts)%*%((1-r.corr)*diag(dim(Z1)[2]) + r.corr*matrix(1,ncol = dim(Z1)[2],nrow = dim(Z1)[2]))%*%diag(wts)
-
-  Z1 <- Genotype.Kernels(Z1,obj.data,kernel = kernel,Is.Common = Is.Common, weights.beta = weights.beta,weights = weights, impute.method = impute.method,r.corr=r.corr,is_check_genotype = is_check_genotype,
-                         is_dosage = is_dosage, missing_cutoff = missing_cutoff, estimate_MAF = estimate_MAF,max_maf = max_maf,verbose = verbose)
+  
+  Z1 <- Genotype.Kernels(Z1,obj.data,kernel = kernel,Is.Common = Is.Common, weights.beta = weights.beta,weights = weights, impute.method = impute.method,r.corr=r.corr,
+                         is_check_genotype = is_check_genotype, is_dosage = is_dosage, missing_cutoff = missing_cutoff, estimate_MAF = estimate_MAF,max_maf = max_maf,verbose = verbose)
   
   pv <- MultiSKAT:::MultiSKAT_base(obj.data,Z1,Sigma_p = Sigma_p)
   re <- list(Score.Object = Sc,Test.Stat = pv$Q,p.value = pv$p.value,Regional.Info.Pheno.Adj = pv$W,Method.Sigma_P = Sigma_p,Method.Sigma_g = Sigma_g,maf = maf)

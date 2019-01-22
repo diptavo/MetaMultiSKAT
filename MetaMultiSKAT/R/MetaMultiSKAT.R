@@ -32,9 +32,10 @@ Meta.MultiSKAT.base <- function(study.list,Sigma_s=NULL,method.s = c("Hom"),Sigm
   kernel.var = Sigma_s%x%diag(ncol(Sigma_g))%x%diag(ncol(Sigma_p))
   Test.stat = t(score.vector)%*%kernel.score%*%score.vector
   L.mat <- MultiSKAT:::mat.sqrt(kernel.var)
-  eigs <- eigen(t(L.mat)%*%phi%*%L.mat)
+  Vmat <- t(L.mat)%*%phi%*%L.mat
+  eigs <- eigen(Vmat)
   pv <- SKAT:::Get_PValue.Lambda(Re(eigs$values),Test.stat)$p.value
-  re <- list(Q = Test.stat, p.value = pv, Sigma_s = Sigma_s,method = method.s)
+  re <- list(Q = Test.stat, p.value = pv, Sigma_s = Sigma_s,method = method.s,lambda = Re(eigs$values),W = Vmat)
   class(re) <- "Meta.MultiSKAT_Object"
   return(re)
 }

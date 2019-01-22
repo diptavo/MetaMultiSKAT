@@ -43,3 +43,32 @@ invnorm <- function(x){
   res = qnorm(res/(length(res)+0.5))
   return(res)
 }
+
+Get_EffectSize<-function(MAF, c=0.4, MAF.cutoff=1, p.neg=0){
+  
+  beta<-abs(log10(MAF)) *c
+  n.neg<-round(length(beta) * p.neg)
+  
+  if(n.neg > 0){
+    idx<-sample(1:length(beta), n.neg)
+    beta[idx]<- -beta[idx]
+  }
+  
+  beta[MAF > MAF.cutoff] = 0
+  return(beta)
+}
+blockMatrixDiagonal <-
+function(...){  
+  matrixList<-list(...)
+  if(is.list(matrixList[[1]])) matrixList<-matrixList[[1]]
+  
+  dimensions<-sapply(matrixList,FUN=function(x) dim(x)[1])
+  finalDimension<-sum(dimensions)
+  finalMatrix<-matrix(0,nrow=finalDimension,ncol=finalDimension)
+  index<-1
+  for(k in 1:length(dimensions)){
+    finalMatrix[index:(index+dimensions[k]-1),index:(index+dimensions[k]-1)]<-matrixList[[k]]
+    index<-index+dimensions[k]
+  }
+  finalMatrix
+}
